@@ -6,6 +6,8 @@ Feature: End to End test - install tools
   ## INSTALL KHERMES
   ##################################################
   Scenario: Install Khermes Seed
+    Given I open a ssh connection to '${VAULT_HOST}' with user 'root' and password 'stratio'
+    And I run 'jq .root_token /opt/stratio/vault/vault_response | sed -e 's/^"//' -e 's/"$//'' in the ssh connection and save the value in environment variable 'vaultToken'
     Given I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
     And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
     And I securely send requests to '${DCOS_IP}:443'
@@ -13,9 +15,9 @@ Feature: End to End test - install tools
       | $.id | UPDATE | khermes |
       | $.env.SEED | UPDATE | true |
       | $.env.PORT0 | UPDATE | 2551 |
-      | $.env.VAULT_HOSTS | UPDATE | ${VAULT_HOSTS} |
+      | $.env.VAULT_HOSTS | UPDATE | ${VAULT_HOST} |
       | $.env.VAULT_PORT  | UPDATE | ${VAULT_PORT}  |
-      | $.env.VAULT_TOKEN | UPDATE | ${VAULT_TOKEN} |
+      | $.env.VAULT_TOKEN | UPDATE | !{vaultToken} |
       | $.env.KAFKA_BROKER_INSTANCE_NAME | UPDATE | ${KAFKA_BROKER_INSTANCE_NAME} |
       | $.env.KAFKA_BROKER_PRINCIPAL     | UPDATE | ${KAFKA_BROKER_PRINCIPAL}     |
     Then the service response status must be '201'
@@ -77,7 +79,7 @@ Feature: End to End test - install tools
     Given I open a ssh connection to '${VAULT_HOST}' with user 'root' and password 'stratio'
     And I run 'jq .root_token /opt/stratio/vault/vault_response | sed -e 's/^"//' -e 's/"$//'' in the ssh connection and save the value in environment variable 'vaultToken'
     Given I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
-    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${DCOS_USER}' and password '${DCOS_PASSWORD}'
+    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
     And I securely send requests to '${DCOS_IP}:443'
     When I send a 'POST' request to '/marathon/v2/apps' based on 'schemas/install_jsons/sparta-no-marathon.json' as 'json' with:
       | $.id | UPDATE | /sparta/sparta-dg-test |
@@ -87,7 +89,7 @@ Feature: End to End test - install tools
     Then the service response must contain the text '201'
     And in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep -w sparta-dg-test.sparta | wc -l' contains '1'
 
-    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${DCOS_USER}' and password '${DCOS_PASSWORD}'
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
     And I run 'dcos marathon task list /sparta/sparta-dg-test | awk '{print $5}' | grep /sparta/sparta-dg-test' in the ssh connection and save the value in environment variable 'marathonTaskId'
     #DCOS dcos marathon task show check healtcheck status
     And in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
@@ -102,7 +104,7 @@ Feature: End to End test - install tools
     Given I open a ssh connection to '${VAULT_HOST}' with user 'root' and password 'stratio'
     And I run 'jq .root_token /opt/stratio/vault/vault_response | sed -e 's/^"//' -e 's/"$//'' in the ssh connection and save the value in environment variable 'vaultToken'
     Given I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
-    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${DCOS_USER}' and password '${DCOS_PASSWORD}'
+    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
     And I securely send requests to '${DCOS_IP}:443'
     And I create file 'config.json' based on 'schemas/elasticsearchstratio-config.json' as 'json' with:
       | $.service.name            | UPDATE  | ${SERVICE}      | n/a    |
@@ -117,10 +119,10 @@ Feature: End to End test - install tools
     Then the command output contains 'DC/OS STRATIO ElasticSearch is being installed!'
     And in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep -w elasticsearchstratio | wc -l' contains '1'
     And in less than '500' seconds, checking each '20' seconds, the command output 'dcos task | grep kibana | wc -l' contains '${KIBANA_COUNT}'
-    And in less than '500' seconds, checking each '20' seconds, the command output 'dcos task | grep master | wc -l' contains '${MASTER_COUNT}'
+    And in less than '500' seconds, checking each '20' seconds, the command output 'dcos task | grep master | wc -l' contains '3'
     And in less than '500' seconds, checking each '20' seconds, the command output 'dcos task | grep coordinator | wc -l' contains '${COOR_COUNT}'
     And in less than '500' seconds, checking each '20' seconds, the command output 'dcos task | grep data | wc -l' contains '${DATA_COUNT}'
-    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${DCOS_USER}' and password '${DCOS_PASSWORD}'
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
     And I run 'dcos marathon task list elasticsearchstratio | awk '{print $5}' | grep elasticsearchstratio' in the ssh connection and save the value in environment variable 'marathonTaskId'
     #DCOS dcos marathon task show check healtcheck status
     And in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
@@ -130,6 +132,8 @@ Feature: End to End test - install tools
   ## INSTALL POSTGRES COMMUNITY
   ##################################################
   Scenario: Install Postgres Community
+    Given I open a ssh connection to '${VAULT_HOST}' with user 'root' and password 'stratio'
+    And I run 'jq .root_token /opt/stratio/vault/vault_response | sed -e 's/^"//' -e 's/"$//'' in the ssh connection and save the value in environment variable 'vaultToken'
     Given I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
     And I securely send requests to '${DCOS_IP}:443'
 
@@ -144,7 +148,7 @@ Feature: End to End test - install tools
       | $.env.POSTGRES_ZOOKEEPER | UPDATE | master.mesos:2181 |
       | $.env.POSTGRES_CPU | UPDATE | 0.5 |
       | $.env.KADMIN_HOST | UPDATE | idp.integration.labs.stratio.com |
-      | $.env.VAULT_TOKEN | UPDATE | !{token} |
+      | $.env.VAULT_TOKEN | UPDATE | !{vaulToken} |
       | $.env.POSTGRES_MESOS_MASTER | UPDATE | master.mesos:2181 |
       | $.env.TENANT_NAME | UPDATE | ${INSTANCE} |
       | $.env.VAULT_PORT | UPDATE | 8200 |
@@ -160,7 +164,7 @@ Feature: End to End test - install tools
     Then the service response status must be '201'
 
     #  Check the result with dcos-cli
-    Given I open a ssh connection to '${DCOS_CLI}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
+    Given I open a ssh connection to '${DCOS_CLI}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
     When in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep ${INSTANCE} | grep R | wc -l' contains '1'
     And I wait '200' seconds
     And I send a 'GET' request to '/mesos/frameworks'
@@ -176,6 +180,6 @@ Feature: End to End test - install tools
   ## INSTALL VALKIRIA
   ##################################################
   #Scenario: Install Valkiria (PHASE 2)
-  #  Given I open a ssh connection to '${DCOS_CLI}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
+  #  Given I open a ssh connection to '${DCOS_CLI}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
   #  When I run 'dcos install package --cli valkiria' in the ssh connection with exit status '0'
   #  Then the command output contains 'New command available: dcos valkiria'
