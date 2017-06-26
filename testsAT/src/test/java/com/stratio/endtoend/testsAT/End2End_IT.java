@@ -22,7 +22,12 @@ import org.testng.annotations.Test;
 import org.testng.annotations.Factory;
 import com.stratio.qa.data.BrowsersDataProvider;
 
-@CucumberOptions(features = { "src/test/resources/features/end2end.feature" })
+@CucumberOptions(features = {
+                                "src/test/resources/features/installation.feature",
+                                "src/test/resources/features/setup.feature",
+                                "src/test/resources/features/execution.feature",
+                                "src/test/resources/features/check.feature"
+                            })
 public class End2End_IT extends BaseTest {
 
     @Factory(enabled = false, dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")
