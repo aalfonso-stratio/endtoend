@@ -1,0 +1,22 @@
+{
+  "LOCAL": {
+    "enabled": false
+  },
+  "service": {
+    "name": "$service"
+  },
+  "coordinator_nodes": {
+    "count": 1
+  },
+  "data_nodes": {
+    "count": 1
+  },
+  "kibana_nodes": {
+    "count": 1
+  },
+  "security": {
+    "vault_hosts": "$VAULT_HOSTS",
+    "vault_port": "$VAULT_PORT",
+    "vault_token": "$VAULT_TOKEN"
+  }
+}
