@@ -9,6 +9,7 @@ Multiple technologies will be involved in this demo:
 * Kafka: As stream processor. 
 * Sparta: To process data.
 * Elasticsearch: To store processed info.
+* Postgres: To store processed data.
 * Valkiria: For chaos generation.
 
 This module depends on a QA library (stratio-test-bdd), where common logic and steps are implemented.
