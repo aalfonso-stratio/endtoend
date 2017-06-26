@@ -165,9 +165,9 @@ Feature: End to End test for full solution
 
     #  Check the result with dcos-cli
     Given I open a ssh connection to '${DCOS_CLI}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
-    When in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep ${INSTANCE} | grep R | wc -l' contains '1'
-    And I wait '200' seconds
-    And I send a 'GET' request to '/mesos/frameworks'
+    Then in less than '300' seconds, checking each '20' seconds, the command output 'dcos task | grep ${INSTANCE} | grep R | wc -l' contains '1'
+    Given I wait '200' seconds
+    When I send a 'GET' request to '/mesos/frameworks'
     Then the service response status must be '200'
     And I save element '$' in environment variable 'coordinator'
     And 'coordinator' matches the following cases:
@@ -194,11 +194,11 @@ Feature: End to End test for full solution
     # TODO: Necesito los secretos
     # We obtain the ip of the node where Khermes is running
     Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
-    When I run 'dcos task khermes | grep -w khermes | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'seedIP'
-    Then My app is running in '!{seedIP}:8082'
+    And I run 'dcos task khermes | grep -w khermes | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'seedIP'
+    And My app is running in '!{seedIP}:8082'
     And I browse to '/'
     # Create kafka-config
-    Given I read file 'schemas/khermes_config/create-kafka-config' as 'string' and save it in environment variable 'kafkaConfig' with:
+    And I read file 'schemas/khermes_config/create-kafka-config' as 'string' and save it in environment variable 'kafkaConfig' with:
       | <kafka-config-name> | REPLACE | kafka1 |
       | <broker0_port> | REPLACE | 10038 |
       | <broker1_port> | REPLACE | 10038 |
@@ -217,8 +217,8 @@ Feature: End to End test for full solution
     Given I read file 'schemas/khermes_config/create-twirl-template' as 'string' and save it in environment variable 'kafkaConfig' with:
       | <twirl-template-name> | REPLACE | template1 |
     And '1' element exists with 'css:textarea[id="command"]'
-    Then I type '!{twirlTemplate}' on the element on index '0'
-    Given '1' element exists with 'css:button[type="button"]'
+    And I type '!{twirlTemplate}' on the element on index '0'
+    And '1' element exists with 'css:button[type="button"]'
     When I click on the element on index '0'
     Then '1' element exists with 'xpath://*[@id="content"]/div/p'
     And the element on index '0' has '{"value":"OK"}' as text
@@ -226,8 +226,8 @@ Feature: End to End test for full solution
     Given I read file 'schemas/khermes_config/create-generator-config' as 'string' and save it in environment variable 'kafkaConfig' with:
       | <generator-config-name> | REPLACE | generator1 |
     And '1' element exists with 'css:textarea[id="command"]'
-    Then I type '!{generatorConfig}' on the element on index '0'
-    Given '1' element exists with 'css:button[type="button"]'
+    And I type '!{generatorConfig}' on the element on index '0'
+    And '1' element exists with 'css:button[type="button"]'
     When I click on the element on index '0'
     Then '1' element exists with 'xpath://*[@id="content"]/div/p'
     And the element on index '0' has '{"value":"OK"}' as text
@@ -258,9 +258,9 @@ Feature: End to End test for full solution
     # Obtain node-id
     Given I read file 'schemas/khermes_config/ls' as 'string' and save it in environment variable 'lsCommand'
     And '1' element exists with 'css:textarea[id="command"]'
-    Then I type '!{lsCommand}' on the element on index '0'
+    And I type '!{lsCommand}' on the element on index '0'
     And I wait '2' seconds
-    Given '1' element exists with 'xpath://*[@id="content"]/button'
+    And '1' element exists with 'xpath://*[@id="content"]/button'
     When I click on the element on index '0'
     Then '1' element exists with 'xpath://*[@id="content"]/div/p'
     And I save content of element in index '0' in environment variable 'nodeText'
@@ -273,8 +273,8 @@ Feature: End to End test for full solution
       | <kafka-config-name> | REPLACE | kafka1 |
       | <node-id>           | REPLACE | !{nodeID} |
     And '1' element exists with 'css:textarea[id="command"]'
-    Then I type '!{startConfig}' on the element on index '0'
-    Given '1' element exists with 'css:button[type="button"]'
+    And I type '!{startConfig}' on the element on index '0'
+    And '1' element exists with 'css:button[type="button"]'
     When I click on the element on index '0'
     Then '1' element exists with 'xpath://*[@id="content"]/div/p'
     And the element on index '0' has '{"value":"OK"}' as text

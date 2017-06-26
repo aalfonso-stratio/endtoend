@@ -13,9 +13,9 @@ Feature: End to End test - start tools
     # Obtain node-id
     Given I read file 'schemas/khermes_config/ls' as 'string' and save it in environment variable 'lsCommand'
     And '1' element exists with 'css:textarea[id="command"]'
-    Then I type '!{lsCommand}' on the element on index '0'
+    And I type '!{lsCommand}' on the element on index '0'
     And I wait '2' seconds
-    Given '1' element exists with 'xpath://*[@id="content"]/button'
+    And '1' element exists with 'xpath://*[@id="content"]/button'
     When I click on the element on index '0'
     Then '1' element exists with 'xpath://*[@id="content"]/div/p'
     And I save content of element in index '0' in environment variable 'nodeText'
@@ -28,8 +28,8 @@ Feature: End to End test - start tools
       | <kafka-config-name> | REPLACE | kafka1 |
       | <node-id>           | REPLACE | !{nodeID} |
     And '1' element exists with 'css:textarea[id="command"]'
-    Then I type '!{startConfig}' on the element on index '0'
-    Given '1' element exists with 'css:button[type="button"]'
+    And I type '!{startConfig}' on the element on index '0'
+    And '1' element exists with 'css:button[type="button"]'
     When I click on the element on index '0'
     Then '1' element exists with 'xpath://*[@id="content"]/div/p'
     And the element on index '0' has '{"value":"OK"}' as text
