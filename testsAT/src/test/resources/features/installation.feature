@@ -46,7 +46,45 @@ Feature: End to End test - install tools
 #    #DCOS dcos marathon task show check healtcheck status
 #    And in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
 
+  ##################################################
+  ## INSTALL ZOOKEEPER FRAMEWORK
+  ##################################################
+  Scenario: Install Zookeeper framework
+    Given I open a ssh connection to '${VAULT_HOST}' with user 'root' and password 'stratio'
+    And I run 'jq .root_token /opt/stratio/vault/vault_response | sed -e 's/^"//' -e 's/"$//'' in the ssh connection and save the value in environment variable 'vaultToken'
+    And I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
+    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    And I securely send requests to '${DCOS_IP}:443'
+    When I send a 'POST' request to '/marathon/v2/apps' based on 'schemas/zookeeper-framework.json' as 'json' with:
+      | $.id | UPDATE | ${ZOOKEEPER_FRAMEWORK_ID} |
+      | $.env.ZOOKEEPER_SERVICE_NAME | UPDATE | ${ZOOKEEPER_FRAMEWORK_ID} |
+      | $.env.TENANT_NAME | UPDATE | ${ZOOKEEPER_FRAMEWORK_ID} |
+      | $.labels.DCOS_SERVICE_NAME | UPDATE | ${ZOOKEEPER_FRAMEWORK_ID} |
+      | $.labels.DCOS_PACKAGE_FRAMEWORK_NAME | UPDATE | ${ZOOKEEPER_FRAMEWORK_ID} |
+      | $.env.VAULT_HOST | UPDATE | ${VAULT_HOST} |
+      | $.env.VAULT_PORT | UPDATE | ${VAULT_PORT} |
+      | $.env.VAULT_TOKEN | UPDATE | !{vaultToken} |
+      | $.env.ZOOKEEPER_DOCKER_IMAGE | UPDATE | ${ZOOKEEPER_DOCKER_IMAGE} |
+      | $.container.docker.image | UPDATE | ${FRAMEWORK_DOCKER_IMAGE} |
+    Then the service response status must be '201'
 
+    # We check that installation finished successfully
+    Given I wait '10' seconds
+    And I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
+    And I securely send requests to '${MASTER_NAME}:443'
+    When in less than '300' seconds, checking each '10' seconds, I send a 'GET' request to '/service/${ZOOKEEPER_FRAMEWORK_ID}/v1/service/status' so that the response contains 'RUNNING'
+    And I save element '$.status[0].status' in environment variable 'zk01_status'
+    And I save element '$.status[1].status' in environment variable 'zk02_status'
+    And I save element '$.status[2].status' in environment variable 'zk03_status'
+    Then in less than '300' seconds, checking each '20' seconds, I send a 'GET' request to '/service/${ZOOKEEPER_FRAMEWORK_ID}/v1/service/status' so that the response contains '"zk-0001","role":"zkNode","status":"RUNNING"'
+    And in less than '300' seconds, checking each '20' seconds, I send a 'GET' request to '/service/${ZOOKEEPER_FRAMEWORK_ID}/v1/service/status' so that the response contains '"zk-0002","role":"zkNode","status":"RUNNING"'
+    And in less than '300' seconds, checking each '20' seconds, I send a 'GET' request to '/service/${ZOOKEEPER_FRAMEWORK_ID}/v1/service/status' so that the response contains '"zk-0003","role":"zkNode","status":"RUNNING"'
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    When I run 'dcos marathon task list ${ZOOKEEPER_FRAMEWORK_ID} | awk '{print $5}' | grep ${ZOOKEEPER_FRAMEWORK_ID}' in the ssh connection and save the value in environment variable 'marathonTaskId'
+    # DCOS dcos marathon task show state RUNNING
+    Then in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
+
+    
   ##################################################
   ## INSTALL KAFKA
   ##################################################
