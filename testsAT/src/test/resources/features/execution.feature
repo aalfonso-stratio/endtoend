@@ -3,7 +3,35 @@ Feature: End to End test - start tools
   ##################################################
   ## START SPARTA
   ##################################################
-  Scenario: Start Sparta policy
+  Scenario: Start Sparta policy - kafka & elasticsearch
+    # Obtain Sparta ip
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    And I run 'dcos marathon task list /sparta/sparta-auto | grep -v APP | awk '{print $4}' in the ssh connection and save the value in environment variable 'spartaIP'
+    And I securely send requests to '!{spartaIP}:10148'
+    # Obtain policy id
+    And I send a 'GET' request to '/policy/findByName/kafka-elastic-tickets-carrefour'
+    Then the service response status must be '200'
+    And I save element '$.id' in environment variable 'elasticWorkflowID'
+    # Execute workflow
+    When I send a 'GET' request to '/policy/run/!{elasticWorkflowID}'
+    Then the service response status must be '200' and its response must contain the text '{"message":"Launched policy with name kafka-elastic-tickets-carrefour'
+    # Verify the generation of workflow in dcos
+    And in less than '100' seconds, checking each '20' seconds, the command output 'dcos marathon task list /sparta/workflows/kafka-elastic-tickets-carrefour | wc -l' contains '2'
+
+  Scenario: Start Sparta policy - kafka & postgres
+    # Obtain Sparta ip
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    And I run 'dcos marathon task list /sparta/sparta-auto | grep -v APP | awk '{print $4}' in the ssh connection and save the value in environment variable 'spartaIP'
+    And I securely send requests to '!{spartaIP}:10148'
+    # Obtain policy id
+    And I send a 'GET' request to '/policy/findByName/kafka-postgres-tickets-carrefour'
+    Then the service response status must be '200'
+    And I save element '$.id' in environment variable 'postgresWorkflowID'
+    # Execute workflow
+    When I send a 'GET' request to '/policy/run/!{postgresWorkflowID}'
+    Then the service response status must be '200' and its response must contain the text '{"message":"Launched policy with name kafka-postgres-tickets-carrefour'
+    # Verify the generation of workflow in dcos
+    And in less than '100' seconds, checking each '20' seconds, the command output 'dcos marathon task list /sparta/workflows/kafka-postgres-tickets-carrefour | wc -l' contains '2'
 
 
   ##################################################
@@ -35,4 +63,7 @@ Feature: End to End test - start tools
     And the element on index '0' has '{"value":"OK"}' as text
 
 
-  # CHAOS GENERATION (PHASE 2)
+  ##################################################
+  ## RELEASE THE KRAKEN
+  ##################################################
+  #Scenario: Start generating chaos

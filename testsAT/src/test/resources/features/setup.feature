@@ -52,5 +52,22 @@ Feature: End to End test - setup tools
   # THIS WILL BE MANUAL FOR THE TIME BEING UNTIL SOLUTION FOR AUTOMATIC TOKEN GENERATION IS PROVIDED
   #Scenario: Setup gosec-management for Sparta
 
+  Scenario: Create Sparta policy - kafka & elasticsearch
+    # Obtain Sparta ip
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    And I run 'dcos marathon task list /sparta/sparta-auto | grep -v APP | awk '{print $4}' in the ssh connection and save the value in environment variable 'spartaIP'
+    And I securely send requests to '!{spartaIP}:10148'
+    # Generate workflow
+    And I send a 'POST' request to '/policy' based on 'schemas/sparta_workflows/kafka-elastic-tickets-carrefour.json' as 'json' with:
+      | id | DELETE | N/A  |
+    Then the service response status must be '200'
 
-  #Scenario: Create Sparta policies
+  Scenario: Create Sparta policy - kafka & postgres
+    # Obtain Sparta ip
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    And I run 'dcos marathon task list /sparta/sparta-auto | grep -v APP | awk '{print $4}' in the ssh connection and save the value in environment variable 'spartaIP'
+    And I securely send requests to '!{spartaIP}:10148'
+    # Generate workflow
+    And I send a 'POST' request to '/policy' based on 'schemas/sparta_workflows/kafka-postgres-tickets-carrefour.json' as 'json' with:
+      | id | DELETE | N/A  |
+    Then the service response status must be '200'
