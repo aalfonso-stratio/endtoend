@@ -66,4 +66,10 @@ Feature: End to End test - start tools
   ##################################################
   ## RELEASE THE KRAKEN
   ##################################################
-  #Scenario: Start generating chaos
+#  Scenario: Start generating chaos
+#    # Obtain kafka broker-0 ip
+#    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+#    And I run 'dcos task broker-0 | grep -w broker-0 | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'kafkaBroker0IP'
+#    # Connect to broker-0 and kill process
+#    Given I open a ssh connection to '!{kafkaBroker0IP}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
+#    Then I run './valkiria o &' in the ssh connection with exit status '0'

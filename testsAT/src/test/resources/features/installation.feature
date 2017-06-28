@@ -27,7 +27,6 @@ Feature: End to End test - install tools
     # DCOS dcos marathon task show check healtcheck status
     Then in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
 
-
 #  Scenario: Install Khermes Client
 #    Given I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
 #    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
@@ -84,7 +83,7 @@ Feature: End to End test - install tools
     # DCOS dcos marathon task show state RUNNING
     Then in less than '300' seconds, checking each '10' seconds, the command output 'dcos marathon task show !{marathonTaskId} | grep TASK_RUNNING | wc -l' contains '1'
 
-    
+
   ##################################################
   ## INSTALL KAFKA
   ##################################################
