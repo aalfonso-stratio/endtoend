@@ -1,0 +1,121 @@
+{
+  "id": "/postgresqlwithsec",
+  "cmd": null,
+  "args": null,
+  "user": null,
+  "env": {
+    "FRAMEWORK_TYPE": "postgresql",
+    "FRAMEWORK_MESOS_MASTER": "master.mesos:2181",
+    "FRAMEWORK_MESOS_PRINCIPAL": "postgres",
+
+    "POSTGRES_SERVICE_NAME": "postgresqlwithsec",
+
+    "POSTGRES_CPU": "0.5",
+    "POSTGRES_MEMORY": "256",
+    "POSTGRES_INSTANCES": "1",
+
+    "POSTGRES_MESOS_PRINCIPAL": "postgres",
+    "POSTGRES_MESOS_ROLE": "postgres",
+
+    "POSTGRES_DOCKER_IMAGE": "stratio/postgresql-community:0.10.0",
+    "POSTGRES_DOCKER_IMAGE_FORCE_PULL": "false",
+
+    "VAULT_HOSTS": "",
+    "VAULT_PORT": "",
+    "VAULT_TOKEN": "",
+
+    "ENABLE_MESOS_SEC": "",
+    "ENABLE_MARATHON_SEC": "",
+
+    "DISABLE_ZOOKEEPER_SEC": "disabled",
+    "POSTGRES_ZOOKEEPER": "",
+    "REALM": "",
+    "KDC_HOST": "",
+    "KADMIN_HOST": "",
+    "TENANT_NAME": "postgresqlwithsec",
+    "ENABLE_POSTGRES_MD5_SECURITY": "true",
+
+    "POSTGRES_DATA_DISK": "256",
+    "POSTGRES_DATA_DISK_TYPE": "ROOT",
+    "POSTGRES_INDEX_DISK": "256",
+    "POSTGRES_INDEX_DISK_TYPE": "ROOT",
+    "POSTGRES_WAL_DISK_TYPE": "ROOT",
+    "POSTGRES_WAL_DISK": "256",
+
+    "POSTGRES_LAUNCH_RETRIES" : "5",
+    "POSTGRES_RETRY_DELAY_SECONDS" : "5",
+
+    "POSTGRES_SERVICE_USER": "serviceuser",
+
+    "ENABLE_API_SECURITY": "true",
+    "API_AUTHORIZED_CN": "admin,postgres",
+    "ENABLE_HIGH_AVAILABILITY": "true",
+    "ZONES_NUMBER": "1",
+    "ZONE_TAG": "availability-zone",
+    "ISOLATION_NETWORK_NAME": "stratio"
+
+  },
+  "ipAddress": { "networkName": "stratio" },
+  "instances": 1,
+  "cpus": 1,
+  "mem": 1024,
+  "disk": 0,
+  "gpus": 0,
+  "executor": null,
+  "constraints": null,
+  "fetch": null,
+  "storeUrls": null,
+  "backoffSeconds": 1,
+  "backoffFactor": 1.15,
+  "maxLaunchDelaySeconds": 3600,
+  "container": {
+    "docker": {
+      "image": "stratio/postgres-bigdata-framework:0.16.0",
+      "forcePullImage": false,
+      "privileged": false,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp",
+          "name": "api",
+          "servicePort": 10113
+        }
+      ],
+      "network": "USER"
+    }
+  },
+  "readinessChecks": null,
+  "dependencies": null,
+  "upgradeStrategy": {
+    "minimumHealthCapacity": 0,
+    "maximumOverCapacity": 0
+  },
+  "labels": {
+    "DCOS_PACKAGE_RELEASE": "0",
+    "DCOS_PACKAGE_REGISTRY_VERSION": "2.0",
+    "DCOS_PACKAGE_VERSION": "0.10.0",
+    "DCOS_PACKAGE_NAME": "Stratio-Community-Postgres",
+    "MARATHON_SINGLE_INSTANCE_APP": "true",
+    "DCOS_PACKAGE_IS_FRAMEWORK": "true",
+    "DCOS_PACKAGE_FRAMEWORK_NAME": "postgresqlwithsec",
+    "DCOS_MIGRATION_API_VERSION": "v1",
+    "DCOS_MIGRATION_API_PATH": "/v1/plan",
+    "DCOS_SERVICE_NAME": "postgresqlwithsec",
+    "DCOS_SERVICE_PORT_INDEX": "0",
+    "DCOS_SERVICE_SCHEME": "http"
+  },
+  "acceptedResourceRoles": null,
+  "residency": null,
+  "secrets": null,
+  "taskKillGracePeriodSeconds": null,
+  "requirePorts": true,
+  "healthChecks": [{
+    "protocol": "HTTP",
+    "path": "/v1/service/health",
+    "gracePeriodSeconds": 300,
+    "intervalSeconds": 60,
+    "timeoutSeconds": 20,
+    "maxConsecutiveFailures": 3,
+    "ignoreHttp1xx": false
+  }]
+}

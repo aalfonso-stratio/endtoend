@@ -37,9 +37,12 @@
   "backoffFactor": 1.15,
   "maxLaunchDelaySeconds": 3600,
   "container": {
+    "ipAddress": {
+        "networkName": "stratio"
+    },
     "docker": {
       "image": "aalfonso/khermes:0.2.0-SNAPSHOT",
-      "forcePullImage": false,
+      "forcePullImage": true,
       "privileged": false,
       "parameters": [
         {
@@ -51,7 +54,7 @@
           "value": "2551:2551"
         }
       ],
-      "network": "HOST"
+      "network": "USER"
     }
   },
   "healthChecks": null,

@@ -13,6 +13,6 @@
 \n    duration: 5 seconds
 \n  }
 \n  stop-rules {
-\n    number-of-events: 100
+\n    number-of-events: 1000
 \n  }
 \n}

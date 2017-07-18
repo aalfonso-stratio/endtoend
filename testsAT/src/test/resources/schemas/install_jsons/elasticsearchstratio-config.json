@@ -17,6 +17,14 @@
   "security": {
     "vault_hosts": "$VAULT_HOSTS",
     "vault_port": "$VAULT_PORT",
-    "vault_token": "$VAULT_TOKEN"
+    "vault_token": "$VAULT_TOKEN",
+    "krb_realm": "$KRB_REALM",
+    "krb_kdc_host": "$KRB_KDC_HOST",
+    "krb_admin_host": "$KRB_ADMIN_HOST",
+    "krb_user_folder": "$KRB_USER_FOLDER",
+    "dynamic_authentication": false,
+    "mesos_securized": false,
+    "principal": "$PRINCIPAL"
+
   }
 }

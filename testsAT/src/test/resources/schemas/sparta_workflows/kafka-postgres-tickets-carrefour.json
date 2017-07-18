@@ -1,9 +1,82 @@
 {
-  "id": "0ff849a8-d968-42ab-b7c0-4dad35dbc647",
-  "storageLevel": "MEMORY_AND_DISK_SER_2",
-  "name": "kafka-postgres-tickets-carrefour",
+  "id": "959276fe-2edb-4a80-ab04-b97c3be41042",
+  "name": "kafka-postgres-endtoend-2",
   "description": "Read carrefour tickets from khermes generator",
-  "sparkStreamingWindow": "2s",
+  "settings": {
+    "global": {
+      "executionMode": "marathon",
+      "streamTemporalTable": "stream",
+      "driverUri": "/opt/sds/sparta/driver/sparta-driver.jar",
+      "userPluginsJars": [
+        {
+          "jarPath": ""
+        }
+      ],
+      "initSqlSentences": [
+        {
+          "sentence": ""
+        }
+      ]
+    },
+    "checkpointSettings": {
+      "checkpointPath": "sparta/checkpoint",
+      "autoDeleteCheckpoint": true,
+      "addTimeToCheckpointPath": false
+    },
+    "streamingSettings": {
+      "window": "6s"
+    },
+    "sparkSettings": {
+      "master": "mesos://leader.mesos:5050",
+      "sparkKerberos": true,
+      "sparkHome": "/opt/spark/dist",
+      "sparkUser": "sparta",
+      "submitArguments": {
+        "userArguments": [
+          {
+            "submitArgument": "--driver-class-path",
+            "submitValue": "/jdbc-drivers/postgresql-9.3-1104-jdbc4.jar"
+          }
+        ],
+        "deployMode": "client",
+        "supervise": false
+      },
+      "sparkConf": {
+        "sparkResourcesConf": {
+          "coresMax": "2",
+          "executorMemory": "1G",
+          "executorCores": "1",
+          "driverCores": "1",
+          "driverMemory": "2G",
+          "localityWait": "10",
+          "taskMaxFailures": "8",
+          "blockInterval": "200ms"
+        },
+        "sparkDockerConf": {
+          "executorDockerImage": "qa.stratio.com/stratio/stratio-spark:2.1.0.1-RC2",
+          "executorDockerVolumes": "/opt/mesosphere/packages/:/opt/mesosphere/packages/:ro,/opt/mesosphere/lib/:/opt/mesosphere/lib/:ro",
+          "executorForcePullImage": true
+        },
+        "sparkMesosConf": {
+          "mesosNativeJavaLibrary": "/opt/mesosphere/lib/libmesos.so",
+          "mesosExecutorHome": "/opt/spark/dist"
+        },
+        "userSparkConf": [
+          {
+            "sparkConfKey": "spark.eventLog.enabled",
+            "sparkConfValue": "true"
+          },
+          {
+            "sparkConfKey": "spark.eventLog.dir",
+            "sparkConfValue": "hdfs://192.168.0.41:8020/user/sparta"
+          }
+        ],
+        "coarse": true,
+        "stopGracefully": true,
+        "parquetBinaryAsString": true
+      }
+    }
+  },
   "transformations": {
     "transformationsPipe": [
       {
@@ -73,6 +146,8 @@
           }
         ],
         "configuration": {
+          "removeInputField": true,
+          "whenError": "Error",
           "queries": [
             {
               "field": "id",
@@ -134,9 +209,7 @@
               "field": "netAmount",
               "query": "$.header.netAmount"
             }
-          ],
-          "whenError": "Error",
-          "removeInputField": true
+          ]
         }
       },
       {
@@ -167,22 +240,8 @@
   },
   "streamTriggers": [
     {
-      "name": "wrongvat",
-      "sql": "SELECT p.id, p.header.ticketNumber, p.header.netAmount, vatitemsexplode.vatitemsexplodeselection.share FROM stream p LATERAL VIEW EXPLODE(p.vatItems) vatitemsexplode as vatitemsexplodeselection WHERE  vatitemsexplode.vatitemsexplodeselection.share <> 21 AND vatitemsexplode.vatitemsexplodeselection.share <> 4 AND vatitemsexplode.vatitemsexplodeselection.share <> 10",
-      "writer": {
-        "outputs": [
-          "postgres"
-        ],
-        "autoCalculatedFields": [],
-        "saveMode": "Append"
-      },
-      "overLast": "6s",
-      "configuration": {},
-      "computeEvery": "6s"
-    },
-    {
-      "name": "dangerousitems",
-      "sql": "SELECT p.id, p.header.ticketNumber, p.header.netAmount as ticketnetAmount, itemsexplode.itemsexplodeselection.description, itemsexplode.itemsexplodeselection.netAmount FROM stream p LATERAL VIEW EXPLODE(p.items) itemsexplode as itemsexplodeselection WHERE  itemsexplode.itemsexplodeselection.netAmount > 500",
+      "name": "triggertickets",
+      "sql": "select id from stream",
       "writer": {
         "outputs": [
           "postgres"
@@ -197,34 +256,20 @@
   ],
   "cubes": [
     {
-      "name": "mallmetrics",
+      "name": "cubetrigger1",
       "dimensions": [
         {
           "name": "mallnumber",
           "field": "mallNumber",
           "precision": "identity",
           "type": "Default"
-        },
-        {
-          "name": "date",
-          "field": "date",
-          "precision": "undefinedminute",
-          "type": "DateTime",
-          "computeLast": "365d"
         }
       ],
       "operators": [
         {
           "type": "Count",
-          "name": "numTickets",
+          "name": "count",
           "configuration": {}
-        },
-        {
-          "type": "Sum",
-          "name": "totalAmount",
-          "configuration": {
-            "inputField": "netAmount"
-          }
         }
       ],
       "writer": {
@@ -236,91 +281,7 @@
         "saveMode": "Upsert"
       },
       "triggers": [],
-      "avoidNullValues": true
-    },
-    {
-      "name": "operatormetrics",
-      "dimensions": [
-        {
-          "name": "operator",
-          "field": "operator",
-          "precision": "identity",
-          "type": "Default"
-        },
-        {
-          "name": "date",
-          "field": "date",
-          "precision": "undefinedminute",
-          "type": "DateTime",
-          "computeLast": "365d"
-        }
-      ],
-      "operators": [
-        {
-          "type": "Count",
-          "name": "numTickets",
-          "configuration": {}
-        },
-        {
-          "type": "Sum",
-          "name": "totalAmount",
-          "configuration": {
-            "inputField": "netAmount"
-          }
-        }
-      ],
-      "writer": {
-        "outputs": [
-          "postgres"
-        ],
-        "dateType": "timestamp",
-        "autoCalculatedFields": [],
-        "saveMode": "Upsert"
-      },
-      "triggers": [],
-      "avoidNullValues": true
-    },
-    {
-      "name": "clientmetrics",
-      "dimensions": [
-        {
-          "name": "clientId",
-          "field": "clientId",
-          "precision": "identity",
-          "type": "Default"
-        },
-        {
-          "name": "date",
-          "field": "date",
-          "precision": "undefinedminute",
-          "type": "DateTime",
-          "computeLast": "365d"
-        }
-      ],
-      "operators": [
-        {
-          "type": "Count",
-          "name": "numTickets",
-          "configuration": {}
-        },
-        {
-          "type": "Sum",
-          "name": "totalAmount",
-          "configuration": {
-            "inputField": "netAmount"
-          }
-        }
-      ],
-      "writer": {
-        "outputs": [
-          "postgres"
-        ],
-        "dateType": "timestamp",
-        "autoCalculatedFields": [],
-        "saveMode": "Upsert"
-      },
-      "triggers": [],
-      "avoidNullValues": true
+      "configuration": {}
     }
   ],
   "input": {
@@ -329,7 +290,7 @@
     "configuration": {
       "key.deserializer": "string",
       "locationStrategy": "preferconsistent",
-      "vaultKeyPassPath": "/v1/userland/passwords/spark-1/keystore",
+      "vaultKeyPassPath": "/v1/userland/passwords/sparta/keystore",
       "topics": [
         {
           "topic": "khermes"
@@ -337,23 +298,26 @@
       ],
       "auto.offset.reset": "latest",
       "partition.assignment.strategy": "range",
+      "vaultTLSEnable": true,
+      "vaultTrustStorePath": "/v1/userland/certificates/sparta",
+      "vaultRole": "",
       "group.id": "",
       "bootstrap.servers": [
         {
-          "host": "broker-0.confluent-kafka-sec.mesos",
-          "port": "10038"
+          "port": "9092",
+          "host": "broker-0001.kafka-sec.mesos"
         },
         {
-          "host": "broker-1.confluent-kafka-sec.mesos",
-          "port": "10038"
+          "port": "9092",
+          "host": "broker-0002.kafka-sec.mesos"
         },
         {
-          "host": "broker-2.confluent-kafka-sec.mesos",
-          "port": "10038"
+          "port": "9092",
+          "host": "broker-0003.kafka-sec.mesos"
         }
       ],
       "enable.auto.commit": false,
-      "vaultCertPath": "/v1/userland/certificates/spark-1",
+      "vaultCertPath": "/v1/userland/certificates/sparta",
       "value.deserializer": "string",
       "kafkaProperties": [
         {
@@ -361,7 +325,8 @@
           "kafkaPropertyValue": ""
         }
       ],
-      "vaultCertPassPath": "/v1/userland/passwords/spark-1/keystore",
+      "vaultCertPassPath": "/v1/userland/passwords/sparta/keystore",
+      "vaultTrustStorePassPath": "/v1/userland/passwords/sparta/keystore",
       "storeOffsetInKafka": true
     }
   },
@@ -370,47 +335,22 @@
       "name": "postgres",
       "type": "Postgres",
       "configuration": {
-        "url": "jdbc:postgresql://10.200.0.151:1026/postgres?user=postgres",
-        "batchsize": "1000",
-        "encoding": "UTF8",
+        "url": "jdbc:postgresql://192.168.0.240:1025/postgres?user=postgres",
+        "postgresSaveMode": "STATEMENT",
+        "batchsize": "",
+        "isolationLevel": "READ_UNCOMMITTED",
         "driver": "",
         "bufferSize": "65536",
-        "newLineSubstitution": " ",
+        "tlsEnable": false,
         "saveOptions": [
           {
-            "saveOptionsKey": "",
-            "saveOptionsValue": ""
+            "saveOptionsValue": "",
+            "saveOptionsKey": ""
           }
         ],
-        "numPartitions": "",
-        "delimiter": "\t"
+        "numPartitions": ""
       }
     }
   ],
-  "fragments": [],
-  "userPluginsJars": [
-    {
-      "jarPath": ""
-    }
-  ],
-  "sparkConf": [
-    {
-      "sparkConfKey": "",
-      "sparkConfValue": ""
-    }
-  ],
-  "sparkSubmitArguments": [
-    {
-      "submitArgument": "",
-      "submitValue": ""
-    }
-  ],
-  "initSqlSentences": [
-    {
-      "sentence": ""
-    }
-  ],
-  "autoDeleteCheckpoint": true,
-  "streamTemporalTable": "stream",
-  "sparkUser": "sparta"
+  "fragments": []
 }

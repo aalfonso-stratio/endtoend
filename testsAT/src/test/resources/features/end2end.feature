@@ -11,7 +11,7 @@ Feature: End to End test for full solution
     Given I authenticate to DCOS cluster '${DCOS_IP}' using email '${DCOS_USER}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
     And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
     And I securely send requests to '${DCOS_IP}:443'
-    When I send a 'POST' request to '/marathon/v2/apps' based on 'schemas/install_jsons/khermes.json' as 'json' with:
+    When I send a 'POST' request to '/marathon/v2/apps' based on 'schemas/install_jsons/khermes-seed.json' as 'json' with:
       | $.id | UPDATE | khermes |
       | $.env.SEED | UPDATE | true |
       | $.env.PORT0 | UPDATE | 2551 |

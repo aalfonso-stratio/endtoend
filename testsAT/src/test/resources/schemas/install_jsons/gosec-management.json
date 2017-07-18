@@ -1,0 +1,137 @@
+{
+  "volumes": null,
+  "id": "/gosecmanagement",
+  "cmd": "/docker-entrypoint.sh",
+  "args": null,
+  "user": null,
+  "env": {
+    "CLIENT_ID": "gosec-management-oauth-id",
+    "KAFKA_PRODUCER_TYPE": "async",
+    "OAUTH2_URL_PROFILE": "https://sso.paas.labs.stratio.com:9005/gosec-sso/oauth2.0/profile",
+    "LDAP_AUTHENTICATION": "simple",
+    "LDAP_QUERIES_USER_QUERYALL": "(&amp;(objectClass=person))",
+    "ZOOKEEPER_CONFIG_CONNECTION_TIMEOUT": "6000",
+    "ELASTIC_INDEX": "audit",
+    "KAFKA_SECURITY_PROTOCOL": "SSL",
+    "SSO_PRINCIPAL": "gosec-sso@DEMO.STRATIO.COM",
+    "ELASTIC_HOSTS": "elastic.demo.stratio.com",
+    "RETRIEVE_FROM_VAULT": "true",
+    "LDAP_SCHEMA": "RFC2307bis",
+    "ZOOKEEPER_CONFIG_HOSTS": "gosec1.node.paas.labs.stratio.com:2181,gosec2.node.paas.labs.stratio.com:2181,gosec3.node.paas.labs.stratio.com:2181",
+    "ZOOKEEPER_CONFIG_TABS": "identities,services,policies",
+    "OAUTH2_ENABLE": "true",
+    "LDAP_MAPPING_USER_ID": "uid",
+    "LDAP_CREDENTIALS": "stratio",
+    "OAUTH2_URL_LOGOUT": "https://sso.paas.labs.stratio.com:9005/gosec-sso/logout",
+    "OAUTH2_LOGIN_GOTO": "/",
+    "KERBEROS_KDC": "idp.integration.labs.stratio.com:88",
+    "LDAP_SECURED": "true",
+    "WATCHERS_ENABLED": "true",
+    "LDAP_QUERIES_GROUP_GROUPBYUSER": "(&amp;(objectClass=posixGroup)(memberUid=uid=%filter,ou=People,dc=stratio,dc=com))",
+    "CACHE_TTL": "60000",
+    "ADMIN_USER": "admin",
+    "LDAP_PORT": "636",
+    "LDAP_MAPPING_USER_NAME": "cn",
+    "VAULT_TOKEN": "12130f4c-14e9-220b-f8ed-c55d81eee08f",
+    "LDAP_USER_DOMAIN": "ou=People,dc=stratio,dc=com",
+    "CLIENT_SECRET": "g0s3c_m4n4g3m3nt",
+    "LDAP_MAPPING_USER_MAIL": "mail",
+    "LDAP_HOST": "idp.integration.labs.stratio.com",
+    "STRING_VAULT_HOST": "vault.service.paas.labs.stratio.com",
+    "OAUTH2_URL_AUTHORIZE": "https://sso.paas.labs.stratio.com:9005/gosec-sso/oauth2.0/authorize",
+    "LDAP_PRINCIPAL": "cn=ldaproot,dc=stratio,dc=com",
+    "ZOOKEEPER_CONFIG_SESSION_TIMEOUT": "6000",
+    "KERBEROS_ADMIN_SERVER": "idp.integration.labs.stratio.com:749",
+    "LDAP_MAPPING_GROUP_ID": "cn",
+    "CACHE_ENABLED": "true",
+    "LDAP_MAPPING_USER_DESCRIPTION": "description",
+    "ZOOKEEPER_ROOT_PATH": "/stratio/gosec",
+    "PERMITTED_ROLES": "management_admin",
+    "LDAP_MATCHING_GROUP_LINKUSER": "uid=%filter",
+    "KAFKA_VALUE_SERIALIZER": "org.apache.kafka.common.serialization.StringSerializer",
+    "ELASTIC_CLUSTER": "elasticsearch",
+    "AKKA_LOG_LEVEL": "INFO",
+    "ZOOKEEPER_HOSTS": "gosec1.node.paas.labs.stratio.com:2181,gosec2.node.paas.labs.stratio.com:2181,gosec3.node.paas.labs.stratio.com:2181",
+    "VAULT_PORT": "8200",
+    "LDAP_GROUP_DOMAIN": "ou=Groups,dc=stratio,dc=com",
+    "KAFKA_KEY_SERIALIZER": "org.apache.kafka.common.serialization.StringSerializer",
+    "LDAP_QUERIES_GROUP_QUERYALL": "(&amp;(objectClass=posixGroup))",
+    "ZK_SASL": "true",
+    "KAFKA_TOPIC": "audit",
+    "OAUTH2_URL_ACCESS_TOKEN": "https://sso.paas.labs.stratio.com:9005/gosec-sso/oauth2.0/accessToken",
+    "MANAGEMENT_PRINCIPAL": "gosec-management@DEMO.STRATIO.COM",
+    "LDAP_MAPPING_GROUP_MEMBER": "memberUid",
+    "COOKIE_NAME": "user",
+    "LDAP_MAPPING_GROUP_NAME": "description",
+    "OAUTH2_URL_CALLBACK": "https://sso.paas.labs.stratio.com/service/gosecmanagement/login",
+    "BULK_ACTIVATE": "false",
+    "KAFKA_HOST": "gosec1.node.paas.labs.stratio.com:9092,gosec2.node.paas.labs.stratio.com:9092,gosec3.node.paas.labs.stratio.com:9092"
+  },
+  "instances": 1,
+  "cpus": 2,
+  "mem": 2048,
+  "disk": 0,
+  "gpus": 0,
+  "executor": null,
+  "constraints": [
+    [
+      "hostname",
+      "UNIQUE"
+    ]
+  ],
+  "fetch": null,
+  "storeUrls": null,
+  "backoffSeconds": 1,
+  "backoffFactor": 1.15,
+  "maxLaunchDelaySeconds": 3600,
+  "container": {
+    "docker": {
+      "image": "qa.stratio.com/stratio/gosec-management:0.10.3",
+      "forcePullImage": true,
+      "privileged": false,
+      "network": "HOST"
+    }
+  },
+  "healthChecks": [
+    {
+      "protocol": "TCP",
+      "gracePeriodSeconds": 300,
+      "intervalSeconds": 15,
+      "timeoutSeconds": 1,
+      "maxConsecutiveFailures": 3
+    }
+  ],
+  "readinessChecks": null,
+  "dependencies": null,
+  "upgradeStrategy": {
+    "minimumHealthCapacity": 1,
+    "maximumOverCapacity": 1
+  },
+  "labels": {
+    "DCOS_PACKAGE_RELEASE": "0",
+    "DCOS_SERVICE_SCHEME": "https",
+    "DCOS_PACKAGE_SOURCE": "http://iodo.stratio.com:8080/repo",
+    "DCOS_PACKAGE_METADATA": "eyJwYWNrYWdpbmdWZXJzaW9uIjoiMi4wIiwibmFtZSI6Imdvc2VjbWFuYWdlbWVudCIsInZlcnNpb24iOiIwLjEwLjAiLCJtYWludGFpbmVyIjoiZ29zZWNAc3RyYXRpby5jb20iLCJkZXNjcmlwdGlvbiI6IkdvU2VjIE1hbmFnZW1lbnQgaGFuZGxlcyBzZWN1cml0eSBhZG1pbmlzdHJhdGlvbiwgY3JlYXRpbmcgYW5kIHVwZGF0aW5nIHBvbGljaWVzIGZvciB1c2VycyBhbmQgZ3JvdXBzIiwidGFncyI6WyJnb3NlY21hbmFnZW1lbnQiXSwic2VsZWN0ZWQiOnRydWUsImZyYW1ld29yayI6ZmFsc2UsInByZUluc3RhbGxOb3RlcyI6IlJlcXVpcmVzIFpvb0tlZXBlciBhbmQgS2Fma2EuIEVsYXN0aWMgaXMgYWxzbyByZXF1aXJlZCB3aGVuIHVzaW5nIHRoZSBBdWRpdCBmdW5jdGlvbnMuIiwicG9zdEluc3RhbGxOb3RlcyI6Ikdvc1NlYyBNYW5hZ2VtZW50IHN1Y2Nlc3NmdWxseSBpbnN0YWxsZWQhIiwicG9zdFVuaW5zdGFsbE5vdGVzIjoiR29TZWMgTWFuYWdlbWVudCBoYXMgYmVlbiB1bmluc3RhbGxlZCBzdWNjZXNzZnVsbHkiLCJpbWFnZXMiOnsiaWNvbi1zbWFsbCI6Imh0dHA6Ly9hc3NldHMuc3RyYXRpby5jb20vbG9nb3MvbG9nb19zdHJhdGlvX3VuaXZlcnNlLnBuZyIsImljb24tbWVkaXVtIjoiaHR0cDovL2Fzc2V0cy5zdHJhdGlvLmNvbS9sb2dvcy9sb2dvX3N0cmF0aW9fdW5pdmVyc2UucG5nIiwiaWNvbi1sYXJnZSI6Imh0dHA6Ly9hc3NldHMuc3RyYXRpby5jb20vbG9nb3MvbG9nb19zdHJhdGlvX3VuaXZlcnNlLnBuZyJ9fQ==",
+    "DCOS_PACKAGE_REGISTRY_VERSION": "2.0",
+    "DCOS_SERVICE_NAME": "gosecmanagement",
+    "DCOS_SERVICE_PORT_INDEX": "0",
+    "DCOS_PACKAGE_VERSION": "0.10.0",
+    "DCOS_PACKAGE_NAME": "gosecmanagement",
+    "DCOS_PACKAGE_IS_FRAMEWORK": "false"
+  },
+  "acceptedResourceRoles": null,
+  "residency": null,
+  "secrets": null,
+  "taskKillGracePeriodSeconds": null,
+  "portDefinitions": [
+    {
+      "protocol": "tcp",
+      "port": 10101
+    },
+    {
+      "protocol": "tcp",
+      "port": 10102
+    }
+  ],
+  "requirePorts": false
+}
