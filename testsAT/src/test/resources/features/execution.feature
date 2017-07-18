@@ -69,35 +69,35 @@ Feature: End to End test - start tools
   @runOnEnv(GENERATE_CHAOS)
   Scenario: Start generating chaos
     Given I wait '180' seconds
-    # Obtain kafka broker-0 ip
-    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
-    And I run 'dcos task broker-0 | grep -w broker-0 | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'kafkaBroker0IP'
-    # Connect to broker-0 and kill process
-    Given I open a ssh connection to '!{kafkaBroker0IP}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
-    When I run 'cd /tmp/valkiria && ./valkiria a --ip=!{kafkaBroker0IP}:9050 &' in the ssh connection with exit status '0'
-    And I run 'curl -s -X GET "http://!{kafkaBroker0IP}:9050/api/v1/list" | jq '.findProcess[1] | select(.KillName | startswith("broker-0")) | .KillName'' locally with exit status '0' and save the value in environment variable 'killName0'
-    Then I run 'curl -X POST -d '{"name":"!{killName0}","properties":"killExecutor=0"}' "http://!{kafkaBroker0IP}:9050/api/v1/valkiria"' locally with exit status '0'
-
-    # We wait some time
-    And I wait '180' seconds
-
     # Obtain kafka broker-1 ip
-    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
-    And I run 'dcos task broker-0 | grep -w broker-1 | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'kafkaBroker1IP'
+    And I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    And I run 'dcos task broker-0001 | grep -w broker-0001 | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'kafkaBroker1IP'
     # Connect to broker-1 and kill process
     Given I open a ssh connection to '!{kafkaBroker1IP}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
     When I run 'cd /tmp/valkiria && ./valkiria a --ip=!{kafkaBroker1IP}:9050 &' in the ssh connection with exit status '0'
-    And I run 'curl -s -X GET "http://!{kafkaBroker1IP}:9050/api/v1/list" | jq '.findProcess[1] | select(.KillName | startswith("broker-1")) | .KillName'' locally with exit status '0' and save the value in environment variable 'killName1'
-    Then I run 'curl -X POST -d '{"name":"!{killName1}","properties":"killExecutor=0"}' "http://!{kafkaBroker1IP}:9050/api/v1/valkiria"' locally with exit status '0'
+    And I run 'curl -s -X GET "http://!{kafkaBroker1IP}:9050/api/v1/list" | jq '.findProcess[1] | select(.KillName | startswith("broker-0001")) | .KillName'' locally with exit status '0' and save the value in environment variable 'killName1'
+    Then I run 'curl -X POST -d '{"name":"!{killName1}","properties":"killExecutor=0"}' "http://!{kafkaBroker0IP}:9050/api/v1/valkiria"' locally with exit status '0'
 
     # We wait some time
     And I wait '180' seconds
 
     # Obtain kafka broker-2 ip
     Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
-    And I run 'dcos task broker-2 | grep -w broker-0 | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'kafkaBroker2IP'
+    And I run 'dcos task broker-0002 | grep -w broker-0002 | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'kafkaBroker2IP'
     # Connect to broker-2 and kill process
     Given I open a ssh connection to '!{kafkaBroker2IP}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
     When I run 'cd /tmp/valkiria && ./valkiria a --ip=!{kafkaBroker2IP}:9050 &' in the ssh connection with exit status '0'
-    And I run 'curl -s -X GET "http://!{kafkaBroker2IP}:9050/api/v1/list" | jq '.findProcess[1] | select(.KillName | startswith("broker-2")) | .KillName'' locally with exit status '0' and save the value in environment variable 'killName2'
+    And I run 'curl -s -X GET "http://!{kafkaBroker2IP}:9050/api/v1/list" | jq '.findProcess[1] | select(.KillName | startswith("broker-0002")) | .KillName'' locally with exit status '0' and save the value in environment variable 'killName2'
     Then I run 'curl -X POST -d '{"name":"!{killName2}","properties":"killExecutor=0"}' "http://!{kafkaBroker2IP}:9050/api/v1/valkiria"' locally with exit status '0'
+
+    # We wait some time
+    And I wait '180' seconds
+
+    # Obtain kafka broker-3 ip
+    Given I open a ssh connection to '${DCOS_CLI_HOST}' with user '${CLI_USER}' and password '${CLI_PASSWORD}'
+    And I run 'dcos task broker-0003 | grep -w broker-0003 | awk '{print $2}'' in the ssh connection with exit status '0' and save the value in environment variable 'kafkaBroker3IP'
+    # Connect to broker-3 and kill process
+    Given I open a ssh connection to '!{kafkaBroker3IP}' with user '${REMOTE_USER}' and password '${REMOTE_PASSWORD}'
+    When I run 'cd /tmp/valkiria && ./valkiria a --ip=!{kafkaBroker3IP}:9050 &' in the ssh connection with exit status '0'
+    And I run 'curl -s -X GET "http://!{kafkaBroker3IP}:9050/api/v1/list" | jq '.findProcess[1] | select(.KillName | startswith("broker-0003")) | .KillName'' locally with exit status '0' and save the value in environment variable 'killName3'
+    Then I run 'curl -X POST -d '{"name":"!{killName3}","properties":"killExecutor=0"}' "http://!{kafkaBroker3IP}:9050/api/v1/valkiria"' locally with exit status '0'
