@@ -1,5 +1,6 @@
 {
-  "id": "/zookeeperdev",
+  "id": "/zookeeperkafka",
+  "volumes": null,
   "cmd": null,
   "args": null,
   "user": null,
@@ -7,37 +8,40 @@
     "ZOOKEEPER_MEMORY": "3072",
     "ZOOKEEPER_LOG_LEVEL": "DEBUG",
     "ZOOKEEPER_ZOOKEEPER": "master.mesos:2181",
-    "ZOOKEEPER_INSTANCES": "3",
-
+    "ZOOKEEPER_LEADER_PORT": "6666",
+    "DISABLE_ZOOKEEPER_SEC": "disabled",
+    "ZOOKEEPER_INSTANCES": "1",
     "FRAMEWORK_MESOS_MASTER": "master.mesos:2181",
-    "ZOOKEEPER_SERVICE_NAME": "zookeeperdev",
-    "REALM": "DEMO.STRATIO.COM",
-    "KADMIN_HOST": "idp.integration.labs.stratio.com",
-    "VAULT_TOKEN": "35a3cc14-b54b-c376-1450-18d88502d125",
-    "ZOOKEEPER_MESOS_ROLE": "zookeeper",
+    "ZOOKEEPER_SERVICE_NAME": "zookeeperkafka",
+    "CONSUL_ADDRESS": "leader.mesos",
+    "REALM": "PERFORMANCE.STRATIO.COM",
+    "ISOLATION_NETWORK_NAME": "stratio",
+    "KADMIN_HOST": "ext-services.labs.stratio.com",
+    "DNS_DOMAIN": "paas.labs.stratio.com",
+    "ZOOKEEPER_FOLLOW_PORT": "5555",
+    "ZOOKEEPER_MESOS_ROLE": "zookeeperkafka",
     "ZOOKEEPER_RETRY_DELAY_SECONDS": "5",
     "ZOOKEEPER_DATA_DISK": "256",
-    "ZOOKEEPER_DOCKER_IMAGE": "qa.stratio.com/stratio/zookeeper-docker:0.7.0-SNAPSHOT",
-    "TENANT_NAME": "zookeeperdev",
+    "ZOOKEEPER_DOCKER_IMAGE": "qa.stratio.com/stratio/zookeeper-docker:0.9.0",
+    "ZOOKEEPER_CLIENT_PORT": "4444",
+    "TENANT_NAME": "zookeeperkafka",
     "VAULT_PORT": "8200",
     "FRAMEWORK_TYPE": "zookeeper",
+    "ENABLE_MESOS_SEC": "true",
     "ZOOKEEPER_DOCKER_IMAGE_FORCE_PULL": "true",
-    "VAULT_HOSTS": "gosec2.node.paas.labs.stratio.com",
-    "FRAMEWORK_MESOS_PRINCIPAL": "zookeeper",
-    "KDC_HOST": "idp.integration.labs.stratio.com",
+    "FRAMEWORK_MESOS_PRINCIPAL": "zookeeperkafka",
+    "ZOOKEEPER_ADMIN_PORT": "7777",
+    "approle": {
+      "secret": "role"
+    },
+    "VAULT_HOSTS": "vault.service.paas.labs.stratio.com",
+    "ZONES_NUMBER": "1",
+    "KDC_HOST": "ext-services.labs.stratio.com",
+    "ZONE_TAG": "availability-zone",
     "ZOOKEEPER_DATA_DISK_TYPE": "ROOT",
     "ZOOKEEPER_CPU": "1",
-    "ZOOKEEPER_LAUNCH_RETRIES": "5",
-    "DISABLE_ZOOKEEPER_SEC": "true",
-    "ZONES_NUMBER": "1",
-    "ZONE_TAG": "availability-zone",
-    "ZOOKEEPER_CLIENT_PORT":"2181",
-    "ZOOKEEPER_FOLLOW_PORT":"2888",
-    "ZOOKEEPER_LEADER_PORT":"3888",
-    "ZOOKEEPER_ADMIN_PORT":"8080",
-
-    "CONSUL_DOMAIN": "paas.labs.stratio.com",
-    "CONSUL_ADDRESS": "AGENT_IP"
+    "ENABLE_MARATHON_SEC": "true",
+    "ZOOKEEPER_LAUNCH_RETRIES": "5"
   },
   "instances": 1,
   "cpus": 1,
@@ -46,18 +50,38 @@
   "gpus": 0,
   "executor": null,
   "constraints": null,
+  "fetch": null,
   "storeUrls": null,
   "backoffSeconds": 1,
   "backoffFactor": 1.15,
   "maxLaunchDelaySeconds": 3600,
   "container": {
     "docker": {
-      "image": "qa.stratio.com/stratio/postgres-bigdata-framework:0.17.0-SNAPSHOT",
+      "image": "qa.stratio.com/stratio/postgres-bigdata-framework:0.19.3",
       "forcePullImage": true,
       "privileged": false,
-      "network": "HOST"
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp",
+          "name": "api",
+          "servicePort": 10111
+        }
+      ],
+      "network": "USER"
     }
   },
+  "healthChecks": [
+    {
+      "protocol": "HTTP",
+      "path": "/v1/service/health",
+      "gracePeriodSeconds": 300,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 20,
+      "maxConsecutiveFailures": 3,
+      "ignoreHttp1xx": false
+    }
+  ],
   "readinessChecks": null,
   "dependencies": null,
   "upgradeStrategy": {
@@ -68,10 +92,10 @@
     "DCOS_PACKAGE_RELEASE": "0",
     "DCOS_SERVICE_SCHEME": "http",
     "DCOS_PACKAGE_REGISTRY_VERSION": "2.0",
-    "DCOS_SERVICE_NAME": "zookeeperdev",
-    "DCOS_PACKAGE_FRAMEWORK_NAME": "zookeeperdev",
+    "DCOS_SERVICE_NAME": "zookeeperkafka",
+    "DCOS_PACKAGE_FRAMEWORK_NAME": "zookeeperkafka",
     "DCOS_SERVICE_PORT_INDEX": "0",
-    "DCOS_PACKAGE_VERSION": "stub-universe",
+    "DCOS_PACKAGE_VERSION": "manual_install",
     "DCOS_MIGRATION_API_PATH": "/v1/plan",
     "DCOS_PACKAGE_NAME": "Stratio-Zookeeper",
     "MARATHON_SINGLE_INSTANCE_APP": "true",
@@ -79,16 +103,14 @@
     "DCOS_MIGRATION_API_VERSION": "v1"
   },
   "acceptedResourceRoles": null,
-  "ipAddress": null,
+  "ipAddress": {
+    "networkName": "stratio"
+  },
   "residency": null,
-  "secrets": null,
-  "taskKillGracePeriodSeconds": null,
-  "portDefinitions": [
-    {
-      "protocol": "tcp",
-      "port": 0,
-      "name": "api"
+  "secrets": {
+    "role": {
+      "source": "open"
     }
-  ],
-  "requirePorts": false
+  },
+  "taskKillGracePeriodSeconds": null
 }
